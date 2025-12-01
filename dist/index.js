@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.default = createAxiosInstance;
+exports.default = createAxiosClient;
 // ------------------------------------------------------------------------------------------------
 const axios_1 = require("axios");
 // ------------------------------------------------------------------------------------------------
@@ -26,10 +26,11 @@ function handleError(error) {
     if (status && status >= 500) {
         throw new Error('Error interno del servidor');
     }
-    throw new Error((_d = (_c = (_b = error.response) === null || _b === void 0 ? void 0 : _b.data) === null || _c === void 0 ? void 0 : _c.message) !== null && _d !== void 0 ? _d : 'Error desconocido');
+    const apiMessage = (_d = (_c = (_b = error.response) === null || _b === void 0 ? void 0 : _b.data) === null || _c === void 0 ? void 0 : _c.message) !== null && _d !== void 0 ? _d : 'Error desconocido';
+    throw new Error(apiMessage);
 }
 // ------------------------------------------------------------------------------------------------
-function createAxiosInstance(baseURL, token, options) {
+function createAxiosClient(baseURL, token, options) {
     const instance = axios_1.default.create({
         baseURL,
         headers: {

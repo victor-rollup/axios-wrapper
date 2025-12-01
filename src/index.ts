@@ -2,12 +2,36 @@
 import axios, {
   AxiosError,
   AxiosInstance,
+  AxiosRequestConfig,
   AxiosResponse,
   CreateAxiosDefaults,
 } from 'axios';
 // ------------------------------------------------------------------------------------------------
 interface IErrorResponse {
   message?: string;
+}
+
+interface ICustomAxiosInstance extends AxiosInstance {
+  get<T = any>(url: string, config?: AxiosRequestConfig): Promise<T>;
+  post<T = any>(
+    url: string,
+    data?: any,
+    config?: AxiosRequestConfig
+  ): Promise<T>;
+  put<T = any>(
+    url: string,
+    data?: any,
+    config?: AxiosRequestConfig
+  ): Promise<T>;
+  delete<T = any>(url: string, config?: AxiosRequestConfig): Promise<T>;
+  patch<T = any>(
+    url: string,
+    data?: any,
+    config?: AxiosRequestConfig
+  ): Promise<T>;
+  head<T = any>(url: string, config?: AxiosRequestConfig): Promise<T>;
+  options<T = any>(url: string, config?: AxiosRequestConfig): Promise<T>;
+  request<T = any>(config: AxiosRequestConfig): Promise<T>;
 }
 // ------------------------------------------------------------------------------------------------
 function handleSuccess<T>({ data }: AxiosResponse<T>): T {
@@ -35,14 +59,15 @@ function handleError(error: AxiosError<IErrorResponse>): never {
     throw new Error('Error interno del servidor');
   }
 
-  throw new Error(error.response?.data?.message ?? 'Error desconocido');
+  const apiMessage = error.response?.data?.message ?? 'Error desconocido';
+  throw new Error(apiMessage);
 }
 // ------------------------------------------------------------------------------------------------
-export default function createAxiosInstance(
+export default function createAxiosClient(
   baseURL: string,
   token?: string,
   options?: CreateAxiosDefaults
-): AxiosInstance {
+): ICustomAxiosInstance {
   const instance = axios.create({
     baseURL,
     headers: {
@@ -55,6 +80,6 @@ export default function createAxiosInstance(
 
   instance.interceptors.response.use(handleSuccess, handleError);
 
-  return instance;
+  return instance as ICustomAxiosInstance;
 }
 // ------------------------------------------------------------------------------------------------
